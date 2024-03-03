@@ -25,14 +25,23 @@ from entity.Player import Player
 
 
 clientApi = LolClientApi()
+res = clientApi.watchReplay("6571041847")
+print(res)
 
-with db.session() as session:  # execute until yield. Session is yielded value
-  # players = session.query(Player).all()
-  # for player in players:
-  #   print(player.name)
 
-  matches = session.query(Match.matchId).order_by(Match.playDatetime.desc()).limit(500).all()
-  for match in matches:
-    clientApi.downloadReplay(match.matchId.split('_')[1])
-    time.sleep(1)
+import os
+import subprocess
+
+# Define the RADS_PATH
+
+
+# with db.session() as session:  # execute until yield. Session is yielded value
+#   # players = session.query(Player).all()
+#   # for player in players:
+#   #   print(player.name)
+#
+#   matches = session.query(Match.matchId).order_by(Match.playDatetime.desc()).limit(500).all()
+#   for match in matches:
+#     clientApi.downloadReplay(match.matchId.split('_')[1])
+#     time.sleep(1)
 
