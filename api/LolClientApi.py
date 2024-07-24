@@ -1,3 +1,7 @@
+import os
+import subprocess
+import time
+
 import requests, json
 from lcuapi import LCU, Event, EventProcessor
 
@@ -47,10 +51,36 @@ class LolClientApi:
     json = self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/download", {"contextData": "string"})
     return json
 
-
   def watchReplay(self, gameId):
-    self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/watch")
+    rads_path = r"C:\Program Files\Riot Games\League of Legends"
 
+    # Check if the path exists
+    if os.path.exists(os.path.join(rads_path, "Game")):
+      # Change the working directory
+      os.chdir(os.path.join(rads_path, "Config"))
+
+      # Find the locale in the LeagueClientSettings.yaml file
+      with open("LeagueClientSettings.yaml", "r") as file:
+        for line in file:
+          if "locale: " in line:
+            locale = line.split(": ")[1].strip()
+
+      # Change the RADS_PATH
+      rads_path = os.path.join(rads_path, "Game")
+
+      # Change the working directory
+      os.chdir(rads_path)
+
+      # Check if the League of Legends.exe exists
+      if os.path.exists("League of Legends.exe"):
+        # Define the command as a string
+        command = f'@start "" "League of Legends.exe" "spectator spectate-record-kr.op.gg:80 wfDgI4LbMIoYvUebzWe4wthfPgJUbrVg {gameId} KR" "-UseRads" "-Locale={locale}" "-GameBaseDir=.."'
+
+        # Use subprocess to execute the command
+        subprocess.call(command, shell=True)
+        time.sleep(5)
+
+    return json
 
   def moveTime(self, second:int):
     json = self.__post("/replay/playback", {"time": second})
