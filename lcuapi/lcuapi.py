@@ -5,9 +5,11 @@ import requests
 import time
 import json
 import abc
+
+import base64
+
 if os.name == 'nt':
     WINDOWS = True
-    import base64
     import ssl
     import websockets
     import wmi
@@ -19,6 +21,8 @@ else:
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+import psutil
 
 from .exceptions import LCUClosedError, LCUDisconnectedError
 # from exceptions import LCUClosedError, LCUDisconnectedError
@@ -100,6 +104,21 @@ class LCU:
         return install_directory, port
 
     @staticmethod
+    def _get_terminal_args():
+        for process in psutil.process_iter(['pid', 'name', 'cmdline']):
+            if process.info['name'] == 'LeagueClientUx':
+                cmd = process.info['cmdline']
+                for segment in cmd:
+                    if '--app-port' in segment:
+                        port = int(segment.split('=')[1])
+                    if '--install-directory' in segment:
+                        install_directory = segment.split('=')[1]
+                break
+        else:
+            raise LCUClosedError('The League client must be running!')
+        return install_directory, port
+
+    @staticmethod
     def _parse_lockfile(install_directory):
         fn = os.path.join(install_directory, 'lockfile')
         with open(fn) as f:
@@ -119,7 +138,10 @@ class LCU:
 
     def _load_startup_data(self):
         """Sets self.install_directory, self.port and self.auth_key."""
-        self.install_directory, self.port = self._get_cmd_args()
+        if os.name == 'nt':
+            self.install_directory, self.port = self._get_cmd_args()
+        elif os.name == 'posix':
+            self.install_directory, self.port = self._get_terminal_args()
         self.auth_key = self._load_auth_key()
         return self.install_directory, self.port, self.auth_key
 
@@ -167,6 +189,7 @@ class LCU:
         if not self.connected:
             raise LCUDisconnectedError()
         try:
+            print(f'{self.lcu_url}:{self.port}{endpoint}', data, f'Basic {self.auth_key}')
             r = requests.post(f'{self.lcu_url}:{self.port}{endpoint}',
                 data=data,
                 headers={'Accept': 'application/json', 'Authorization': f'Basic {self.auth_key}'},
@@ -178,6 +201,7 @@ class LCU:
                 data=data,
                 headers={'Accept': 'application/json', 'Authorization': f'Basic {self.auth_key}'},
                 verify=False)
+        print(r)
         return r
 
     def delete(self, endpoint, data: dict = None):
@@ -285,6 +309,43 @@ class LCU:
             win32file.FindCloseChangeNotification(change_handle)
         return retried
 
+    def __wait_for_client_to_open_from_lockfile_posix(self, check_interval=3, timeout=float('inf')):
+        import os
+        import time
+        from watchdog.observers import Observer
+        from watchdog.events import FileSystemEventHandler
+
+        retried = 0
+
+        path_to_watch = os.path.join(self.install_directory)
+
+        if "lockfile" in os.listdir(path_to_watch):
+            return retried
+
+        class EventHandler(FileSystemEventHandler):
+            def on_created(self, event):
+                if event.src_path.endswith("lockfile"):
+                    self.lockfile_created = True
+
+        event_handler = EventHandler()
+        observer = Observer()
+        observer.schedule(event_handler, path_to_watch)
+        observer.start()
+
+        try:
+            while True:
+                if hasattr(event_handler, "lockfile_created") and event_handler.lockfile_created:
+                    time.sleep(1)  # Wait another second for the lockfile to be written to
+                    break
+                time.sleep(check_interval)
+                retried += check_interval
+                if retried > timeout:
+                    raise TimeoutError(f"Timed out waiting for LCU to open. Waited for {retried} seconds.")
+        finally:
+            observer.stop()
+            observer.join()
+        return retried
+
     def __wait_for_client_to_open_from_process(self, check_interval=3, timeout=float('inf')):
         while True:
             retried = 0
@@ -304,7 +365,10 @@ class LCU:
             retried = self.__wait_for_client_to_open_from_process(check_interval=check_interval, timeout=timeout)
         if self.install_directory is not None:
             print("Waiting for LCU to open from lockfile...")
-            retried = self.__wait_for_client_to_open_from_lockfile(check_interval=check_interval, timeout=timeout)
+            if os.name == 'nt':
+                retried = self.__wait_for_client_to_open_from_lockfile(check_interval=check_interval, timeout=timeout)
+            else:
+                retried = self.__wait_for_client_to_open_from_lockfile_posix(check_interval=check_interval, timeout=timeout)
         self.connected = True
         self._load_startup_data()
         return retried

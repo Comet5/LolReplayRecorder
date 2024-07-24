@@ -20,4 +20,6 @@ class Match(Base):
   playDatetime = Column(DateTime, nullable=False)
   createdDatetime = Column(DateTime, nullable=False)
   updatedDatetime = Column(DateTime)
+  replayDownloaded = Column(Boolean, nullable=False)
+  sceneDownloaded = Column(Boolean, nullable=False)
 

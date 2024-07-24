@@ -44,10 +44,13 @@ class LolClientApi:
 
 
   def downloadReplay(self, gameId):
-    print(gameId)
     json = self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/download", {"contextData": "string"})
-    print(json.reason)
     return json
+
+
+  def watchReplay(self, gameId):
+    self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/watch")
+
 
   def moveTime(self, second:int):
     json = self.__post("/replay/playback", {"time": second})

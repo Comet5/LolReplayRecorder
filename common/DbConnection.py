@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 
+from urllib.parse import quote
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+import config
 
 # 연결할 db url
 
@@ -26,10 +28,12 @@ from sqlalchemy.orm import sessionmaker
 #       session.close()
 
 
-SQLALCHEMY_DATABASE_URL = "mariadb://jachee:4eQJg8NWTCThBNHYR24NEEij3YVmxCc4@129.154.209.75:3306/prorank"
+SQLALCHEMY_DATABASE_URL = f"mariadb://{config.DB_ID}:{quote(config.DB_PW)}@{config.DB_IP}:3306/prorank"
+# engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
 
 @contextmanager
 def session():

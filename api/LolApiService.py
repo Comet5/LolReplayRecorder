@@ -1,7 +1,7 @@
 import time
 
 import requests
-import config
+import common
 from data import Riot
 from data.enum.riot.RiotPlatform import RiotPlatform
 from data.enum.riot.RiotRegion import RiotRegion
@@ -51,7 +51,7 @@ class RiotApiService:
 
 
     def __request(self, uri):
-        res = requests.get(url=uri, headers={'X-Riot-Token': config.RIOT_TOKEN}, timeout=10)
+        res = requests.get(url=uri, headers={'X-Riot-Token': common.RIOT_TOKEN}, timeout=10)
         print(f'{res.status_code} {res.elapsed.total_seconds()}  {res.url}')
         if res.status_code == 429:
             print('API_LIMIT :: Sleep10s')
