@@ -18,3 +18,4 @@ class PlayerAccount:
     latestPlayedDatetime: Optional[date] = None
     createdDatetime: Optional[date] = None
     updatedDatetime: Optional[date] = None
+
