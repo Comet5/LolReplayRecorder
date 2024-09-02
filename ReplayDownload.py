@@ -1,7 +1,6 @@
 import time
 import datetime
 
-from cv2 import matchShapes
 
 from api.LolClientApi import LolClientApi
 import common.DbConnection as db
