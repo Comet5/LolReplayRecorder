@@ -3,8 +3,10 @@ import subprocess
 import time
 
 import requests, json
-from lcuapi import LCU, Event, EventProcessor
+from six import print_
 
+from lcuapi import LCU, Event, EventProcessor
+import config
 
 
 class LolClientApi:
@@ -52,33 +54,65 @@ class LolClientApi:
     return json
 
   def watchReplay(self, gameId):
-    rads_path = r"C:\Program Files\Riot Games\League of Legends"
+    if os.path.exists(config.LOL_INGAME_EXE_PATH) == False:
+      print("League of Legends.exe file not found")
+      return
+    # json = self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/watch", {"contextData": "string"})
+    # json = self.lcu.post(f"/lol-replays/v2/metadata/{gameId}/create", {"contextData": "string"})
 
-    # Check if the path exists
-    if os.path.exists(os.path.join(rads_path, "Game")):
-      # Change the working directory
-      os.chdir(os.path.join(rads_path, "Config"))
+    # time.sleep(3)
+    # # windows
+    # subprocess.run(["open", f'"{config.LOL_EXE_PATH}" "{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl"'])
 
-      # Find the locale in the LeagueClientSettings.yaml file
-      with open("LeagueClientSettings.yaml", "r") as file:
-        for line in file:
-          if "locale: " in line:
-            locale = line.split(": ")[1].strip()
+    # mac
+    print("open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl")
+    subprocess.run(["open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl"], check=True)
 
-      # Change the RADS_PATH
-      rads_path = os.path.join(rads_path, "Game")
 
-      # Change the working directory
-      os.chdir(rads_path)
+    # if os.path.exists(config.LOL_CONFIG_DIR_PATH+"LeagueClientSettings.yaml") == False:
+    #   print("LeagueClientSettings.yaml file not found")
+    #   return
+    # if os.path.exists(config.LOL_EXE_PATH) == False:
+    #   print("League of Legends.exe file not found")
+    #   return
+    #
+    # # Find the locale in the LeagueClientSettings.yaml file
+    # with open(config.LOL_CONFIG_DIR_PATH+"LeagueClientSettings.yaml", "r") as file:
+    #   for line in file:
+    #     if "locale: " in line:
+    #       locale = line.split(": ")[1].strip()
+    #
+    # command = f'@start "" "{config.LOL_EXE_PATH}" "spectator spectate-record-kr.op.gg:80 wfDgI4LbMIoYvUebzWe4wthfPgJUbrVg {gameId} KR" "-UseRads" "-Locale={locale}" "-GameBaseDir=.."'
+    #
+    # # Use subprocess to execute the command
+    # subprocess.call(command, shell=True)
+    # time.sleep(5)
 
-      # Check if the League of Legends.exe exists
-      if os.path.exists("League of Legends.exe"):
-        # Define the command as a string
-        command = f'@start "" "League of Legends.exe" "spectator spectate-record-kr.op.gg:80 wfDgI4LbMIoYvUebzWe4wthfPgJUbrVg {gameId} KR" "-UseRads" "-Locale={locale}" "-GameBaseDir=.."'
-
-        # Use subprocess to execute the command
-        subprocess.call(command, shell=True)
-        time.sleep(5)
+    # # Check if the path exists
+    # if os.path.exists(os.path.join(rads_path, "Game")):
+    #   # Change the working directory
+    #   os.chdir(os.path.join(rads_path, "Config"))
+    #
+    #   # Find the locale in the LeagueClientSettings.yaml file
+    #   with open("LeagueClientSettings.yaml", "r") as file:
+    #     for line in file:
+    #       if "locale: " in line:
+    #         locale = line.split(": ")[1].strip()
+    #
+    #   # Change the RADS_PATH
+    #   rads_path = os.path.join(rads_path, "Game")
+    #
+    #   # Change the working directory
+    #   os.chdir(rads_path)
+    #
+    #   # Check if the League of Legends.exe exists
+    #   if os.path.exists("League of Legends.exe"):
+    #     # Define the command as a string
+    #     command = f'@start "" "League of Legends.exe" "spectator spectate-record-kr.op.gg:80 wfDgI4LbMIoYvUebzWe4wthfPgJUbrVg {gameId} KR" "-UseRads" "-Locale={locale}" "-GameBaseDir=.."'
+    #
+    #     # Use subprocess to execute the command
+    #     subprocess.call(command, shell=True)
+    #     time.sleep(5)
 
     return json
 

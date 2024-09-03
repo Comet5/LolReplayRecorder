@@ -1,12 +1,12 @@
 import datetime
 
 import config
-from service.ReplayService import ReplayService
+from service.LcuService import LcuService
 import service.DiscordService as discord
 
 discord = discord.DiscordService()
 try:
-  replay_service = ReplayService()
+  replay_service = LcuService()
   replay_service.download_replay(datetime.datetime.now() - datetime.timedelta(days=2))
 except Exception as e:
   discord.send_discord_webhook(config.DISCORD_WEBHOOK_URI, f"Replay Download Failed: {e}")

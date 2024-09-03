@@ -201,7 +201,7 @@ class LCU:
                 data=data,
                 headers={'Accept': 'application/json', 'Authorization': f'Basic {self.auth_key}'},
                 verify=False)
-        print(r)
+        print(r.__dict__)
         return r
 
     def delete(self, endpoint, data: dict = None):
