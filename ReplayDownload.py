@@ -6,8 +6,9 @@ import service.DiscordService as discord
 
 discord = discord.DiscordService()
 try:
-  replay_service = LcuService()
-  replay_service.download_replay(datetime.datetime.now() - datetime.timedelta(days=2))
+  lcu = LcuService()
+  lcu.run_league_of_legends()
+  lcu.download_replay(datetime.datetime.now() - datetime.timedelta(days=2))
 except Exception as e:
   discord.send_discord_webhook(config.DISCORD_WEBHOOK_URI, f"Replay Download Failed: {e}")
   raise e

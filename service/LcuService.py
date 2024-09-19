@@ -24,7 +24,7 @@ class LcuService:
       return
 
     print("League of Legends를 실행합니다...")
-    subprocess.run(["open", config.LOL_EXE_PATH])
+    # subprocess.run(["open", config.LOL_EXE_PATH])
     self.lcu = LolClientApi()
 
   def modify_config_file(self):

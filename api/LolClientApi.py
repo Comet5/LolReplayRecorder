@@ -3,7 +3,6 @@ import subprocess
 import time
 
 import requests, json
-from six import print_
 
 from lcuapi import LCU, Event, EventProcessor
 import config
@@ -57,7 +56,7 @@ class LolClientApi:
     if os.path.exists(config.LOL_INGAME_EXE_PATH) == False:
       print("League of Legends.exe file not found")
       return
-    # json = self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/watch", {"contextData": "string"})
+    json = self.lcu.post(f"/lol-replays/v1/rofls/{gameId}/watch", {"contextData": "string"})
     # json = self.lcu.post(f"/lol-replays/v2/metadata/{gameId}/create", {"contextData": "string"})
 
     # time.sleep(3)
@@ -65,8 +64,8 @@ class LolClientApi:
     # subprocess.run(["open", f'"{config.LOL_EXE_PATH}" "{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl"'])
 
     # mac
-    print("open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl")
-    subprocess.run(["open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl"], check=True)
+    # print("open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl")
+    # subprocess.run(["open", "-na", f"{config.LOL_INGAME_EXE_PATH}", "--args", f"{config.LOL_REPLAY_DIR_PATH}KR-{gameId}.rofl"], check=True)
 
 
     # if os.path.exists(config.LOL_CONFIG_DIR_PATH+"LeagueClientSettings.yaml") == False:

@@ -21,7 +21,7 @@ discord = discord.DiscordService()
 try:
   lcu = LcuService()
   lcu.run_league_of_legends()
-  lcu.run_replay('7257757677')
+  lcu.run_replay('7256908283')
 except Exception as e:
   discord.send_discord_webhook(config.DISCORD_WEBHOOK_URI, f"Replay Download Failed: {e}")
   raise e
