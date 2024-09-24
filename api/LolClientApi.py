@@ -3,6 +3,7 @@ import subprocess
 import time
 
 import requests, json
+from six import print_
 
 from lcuapi import LCU, Event, EventProcessor
 import config
@@ -53,6 +54,8 @@ class LolClientApi:
     return json
 
   def watchReplay(self, gameId):
+    if '_' in gameId:
+      gameId = gameId.split('_')[1]
     if os.path.exists(config.LOL_INGAME_EXE_PATH) == False:
       print("League of Legends.exe file not found")
       return
@@ -130,6 +133,27 @@ class LolClientApi:
         "z": -1200.0
       }
     })
+
+  def start_recording(self, start_time, end_time):
+    data = {
+      "codec": "webm",
+      "endTime": end_time,
+      "enforceFrameRate": False,
+      "framesPerSecond": 60,
+      "lossless": True,
+      "recording": True,
+      "replaySpeed": 2.0,
+      "startTime": start_time,
+      "path": "/Users/Oh/Documents/League of Legends/Highlights"
+    }
+    json = self.__post("/replay/recording", data)
+    print(json)
+    return json
+
+  def get_record_status(self, ):
+    json = self.__get("/replay/recording")
+    print('get_record_status :', json)
+    return json
 
   def __get(self, uri:str):
     print("GET ::", f"{self.host, uri}")

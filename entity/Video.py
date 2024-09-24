@@ -2,11 +2,11 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, SmallIn
 from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
-class MatchVideo(Base):
-  __tablename__ = "match_video"
+class Video(Base):
+  __tablename__ = "video"
   id = Column(Integer, primary_key=True)
-  matchTimelineKillFrameId = Column(Integer, nullable=False)
-  matchId = Column(String(255), nullable=False)
+  localFileName = Column(String(200))
+  playSeconds = Column(Integer)
   youtubeTitle = Column(String(255))
   youtubeDescription = Column(Text)
   youtubeUri = Column(Text)

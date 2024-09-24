@@ -1,4 +1,5 @@
 import time
+import datetime
 
 import requests
 from sqlalchemy import func
@@ -16,15 +17,21 @@ import config
 from service.LcuService import LcuService
 import service.DiscordService as discord
 
+# targetNicknames = ['Chovy']
+targetNicknames = ['Canyon', 'Chovy', 'Peyz', 'Kiin', 'Faker', 'ShowMaker',
+                   'Zeus', 'Oner', 'Gumayusi', 'Keria', 'Morgan']
 
 discord = discord.DiscordService()
 try:
   lcu = LcuService()
   lcu.run_league_of_legends()
-  lcu.run_replay('7256908283')
+  lcu.download_kill_scene(targetNicknames, datetime.datetime.now() - datetime.timedelta(days=2))
 except Exception as e:
   discord.send_discord_webhook(config.DISCORD_WEBHOOK_URI, f"Replay Download Failed: {e}")
   raise e
+
+
+
 
 # # Download Replay
 # with (db.session() as session):
